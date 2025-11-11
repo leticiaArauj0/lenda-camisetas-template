@@ -29,11 +29,19 @@ const seedDb =async () => {
   };
 
   try {
+    console.log('Starting database population...');
     const initialDataPath = path.join(require.resolve('@vendure/create'), '../assets/initial-data.json');
-    const app = await populate(() => bootstrap(updatedConfig), require(initialDataPath));
+    console.log('Initial data path:', initialDataPath);
+
+    const initialData = require(initialDataPath);
+    console.log('Initial data loaded, contains:', Object.keys(initialData));
+
+    const app = await populate(() => bootstrap(updatedConfig), initialData);
+    console.log('Population completed successfully');
     await app.close();
+    console.log('Database seeding completed');
   } catch (err) {
-    console.log(err);
+    console.error('Seeding failed:', err);
     process.exit(1);
   }
 };

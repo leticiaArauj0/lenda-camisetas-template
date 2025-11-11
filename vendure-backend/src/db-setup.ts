@@ -10,18 +10,20 @@ export const dbSeeded = async (dbConfig: DataSourceOptions): Promise<boolean> =>
 
     const queryRunner = dataSource.createQueryRunner();
 
-    // Check if a specific table exists that is created during seeding
-    const tableExists = await queryRunner.hasTable('migrations');
-
-    // Alternatively, you can check for the presence of a specific record
-    // const recordExists = await queryRunner.manager.findOne(YourEntity, { /* condition */ });
+    // Check if the database has been seeded by looking for the superadmin user
+    // that gets created during initial seeding
+    const superadminExists = await queryRunner.manager.query(`
+      SELECT COUNT(*) as count FROM administrator
+      WHERE identifier = $1
+    `, [process.env.SUPERADMIN_USERNAME || 'superadmin']);
 
     await queryRunner.release();
     await dataSource.destroy();
 
-    console.log('Database seeded:', tableExists);
+    const isSeeded = parseInt(superadminExists[0].count) > 0;
+    console.log('Database seeded:', isSeeded);
 
-    return tableExists;
+    return isSeeded;
   } catch (error) {
     console.error('Error checking if database has been seeded:', error);
     return false;
