@@ -58,9 +58,11 @@ that has been auto-generated on railway, and add to your `.env`. Or use value fo
 
 ### commands
 `cd vendure-backend/`
-`yarn build` or `npm run build` will compile the app.
-`yarn dev` or `npm run dev` will start the local admin dashboard app to manage products and orders etc. at: `localhost:3000/admin`
-`yarn start` or `npm run start` will start the backend server and serve admin dashboard. at: `localhost:3000/admin`
+`pnpm install` to install dependencies
+`pnpm build` will compile the app.
+`pnpm dev` will start the local development server with admin dashboard at: `localhost:3000/admin`
+`pnpm start` will start the production backend server with admin dashboard at: `localhost:3000/admin`
+`pnpm seed:once` will seed the database with initial data (run after first setup). This script automatically rebuilds native modules like bcrypt to ensure compatibility across different platforms.
 
 ### additional resources
 - **Tutorial blog post**: [Vendure Tutorial on Funkyton](https://funkyton.com/vendure-tutorial/)
@@ -75,3 +77,7 @@ that has been auto-generated on railway, and add to your `.env`. Or use value fo
     </picture>
   </a>
 </p>
+
+### License
+
+This project is licensed under the GPLv3 License. See the [LICENSE](LICENSE.md) file for details.

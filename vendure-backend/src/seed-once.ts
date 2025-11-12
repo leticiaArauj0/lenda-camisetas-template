@@ -1,12 +1,21 @@
 import path from 'path';
 import axios from 'axios';
+import { execSync } from 'child_process';
 import { bootstrap } from '@vendure/core';
 import { config } from './vendure-config';
-import { dbSeeded, DbConnectionOptions } from './db-setup';
+import { dbSeeded } from './db-setup';
 import { populate } from '@vendure/core/cli';
 
 const seedDb =async () => {
-  const dbAlreadySeeded = await dbSeeded(config.dbConnectionOptions as DbConnectionOptions);
+  // Rebuild native modules like bcrypt that may have issues on different platforms
+  console.log('Rebuilding native modules...');
+  try {
+    execSync('npm rebuild bcrypt', { stdio: 'inherit' });
+    console.log('Native modules rebuilt successfully');
+  } catch (error) {
+    console.warn('Failed to rebuild native modules, continuing anyway:', (error as Error).message);
+  }
+  const dbAlreadySeeded = await dbSeeded(config.dbConnectionOptions);
   if (dbAlreadySeeded) {
     console.log('Database already seeded, skipping...');
     process.exit(0);
@@ -18,13 +27,21 @@ const seedDb =async () => {
       synchronize: !dbAlreadySeeded,
     },
   };
-  
+
   try {
+    console.log('Starting database population...');
     const initialDataPath = path.join(require.resolve('@vendure/create'), '../assets/initial-data.json');
-    const app = await populate(() => bootstrap(updatedConfig), require(initialDataPath));
+    console.log('Initial data path:', initialDataPath);
+
+    const initialData = require(initialDataPath);
+    console.log('Initial data loaded, contains:', Object.keys(initialData));
+
+    const app = await populate(() => bootstrap(updatedConfig), initialData);
+    console.log('Population completed successfully');
     await app.close();
+    console.log('Database seeding completed');
   } catch (err) {
-    console.log(err);
+    console.error('Seeding failed:', err);
     process.exit(1);
   }
 };
