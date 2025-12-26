@@ -23,7 +23,7 @@ export const config: VendureConfig = {
             origin: [
                 'http://localhost:3000',
                 'https://lenda-camisetas.up.railway.app',
-                process.env.STOREFRONT_URL || 'https://sua-loja-front.vercel.app',
+                process.env.STOREFRONT_URL || 'https://lenda-camisetas.up.railway.app',
             ],
             credentials: true,
         },
@@ -71,10 +71,11 @@ export const config: VendureConfig = {
             templatePath: path.join(__dirname, '../static/email/templates'),
             transport: {
                 type: 'smtp',
-                host: process.env.SMTP_HOST,
-                port: 587,
+                host: 'smtp.sendgrid.net',
+                port: 2525,                
+                secure: false,            
                 auth: {
-                    user: process.env.SMTP_USER,
+                    user: 'apikey',        
                     pass: process.env.SMTP_PASS,
                 },
                 logging: true,
@@ -83,7 +84,7 @@ export const config: VendureConfig = {
             globalTemplateVars: {
                 fromAddress: '"Lenda Camisetas" <camisetas.lenda@gmail.com>',
                 verifyEmailAddressUrl: 'https://lenda-camisetas.up.railway.app/verify',
-                passwordResetUrl: 'https://lenda-camisetas.up.railway.app/password-reset',
+                passwordResetUrl: 'https://lenda-camisetas.up.railway.app/reset-password',
                 changeEmailAddressUrl: 'https://lenda-camisetas.up.railway.app/verify-email-address-change'
             },
         }),
