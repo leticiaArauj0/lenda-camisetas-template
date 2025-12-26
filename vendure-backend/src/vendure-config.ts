@@ -42,23 +42,19 @@ const emailPluginOptions = isDev || !process.env.SENDGRID_API_KEY ? {
 
 export const config: VendureConfig = {
     apiOptions: {
-        // hostname: process.env.PUBLIC_DOMAIN,
         port: +(process.env.PORT || 3000),
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
         
-        // --- ADICIONEI ESTE BLOCO CORS ---
         cors: {
             origin: [
                 'http://localhost:3000',
-                'http://localhost:8002', // <--- IMPORTANTE: Libera seu Storefront local
+                'http://localhost:8002',
                 'http://localhost:4200',
-                // Tenta pegar o domínio do Railway ou usa um fallback seguro
                 process.env.PUBLIC_DOMAIN ? `https://${process.env.PUBLIC_DOMAIN}` : 'https://lenda-camisetas-production.up.railway.app',
             ],
             credentials: true,
         },
-        // ---------------------------------
 
         ...(isDev ? {
             adminApiPlayground: {
