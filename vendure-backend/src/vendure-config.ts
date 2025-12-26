@@ -14,12 +14,12 @@ import path from 'path';
 
 const isDev: Boolean = process.env.APP_ENV === 'dev';
 
-// Configuração unificada do Email Plugin
 const emailPluginOptions = process.env.SMTP_HOST ? {
     transport: {
         type: 'smtp',
         host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT) || 587,
+        port: Number(process.env.SMTP_PORT) || 465,
+        secure: true,
         auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS,
