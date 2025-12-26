@@ -72,14 +72,20 @@ export const config: VendureConfig = {
         EmailPlugin.init({
             handlers: defaultEmailHandlers,
             templatePath: path.join(__dirname, '../static/email/templates'),
-            transport: nodemailerSendgrid({
-                apiKey: process.env.SMTP_PASS
-            }),
+            transport: {
+                type: 'smtp',
+                host: 'smtp.sendgrid.net',
+                port: 2525,
+                secure: false,
+                auth: {
+                    user: 'apikey',
+                    pass: process.env.SMTP_PASS, 
+                },
+                logging: true, 
+            },
             globalTemplateVars: {
                 fromAddress: '"Lenda Camisetas" <camisetas.lenda@gmail.com>',
                 verifyEmailAddressUrl: 'https://lenda-camisetas.up.railway.app/verify',
-                passwordResetUrl: 'https://lenda-camisetas.up.railway.app/password-reset',
-                changeEmailAddressUrl: 'https://lenda-camisetas.up.railway.app/verify-email-address-change'
             },
         }),
 
