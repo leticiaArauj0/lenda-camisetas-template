@@ -9,6 +9,7 @@ import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import { StripePlugin } from '@vendure/payments-plugin/package/stripe';
+import { nodemailerSendgrid } from 'nodemailer-sendgrid';
 import 'dotenv/config';
 import path from 'path';
 
@@ -69,22 +70,13 @@ export const config: VendureConfig = {
         EmailPlugin.init({
             handlers: defaultEmailHandlers,
             templatePath: path.join(__dirname, '../static/email/templates'),
-            transport: {
-                type: 'smtp',
-                host: 'smtp.sendgrid.net',
-                port: 2525,                
-                secure: false,            
-                auth: {
-                    user: 'apikey',        
-                    pass: process.env.SMTP_PASS,
-                },
-                logging: true,
-                debug: true,
-            },
+            transport: nodemailerSendgrid({
+                apiKey: process.env.SMTP_PASS
+            }),
             globalTemplateVars: {
                 fromAddress: '"Lenda Camisetas" <camisetas.lenda@gmail.com>',
                 verifyEmailAddressUrl: 'https://lenda-camisetas.up.railway.app/verify',
-                passwordResetUrl: 'https://lenda-camisetas.up.railway.app/reset-password',
+                passwordResetUrl: 'https://lenda-camisetas.up.railway.app/password-reset',
                 changeEmailAddressUrl: 'https://lenda-camisetas.up.railway.app/verify-email-address-change'
             },
         }),
