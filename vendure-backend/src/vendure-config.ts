@@ -46,9 +46,20 @@ export const config: VendureConfig = {
         port: +(process.env.PORT || 3000),
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
-        // The following options are useful in development mode,
-        // but are best turned off for production for security
-        // reasons.
+        
+        // --- ADICIONEI ESTE BLOCO CORS ---
+        cors: {
+            origin: [
+                'http://localhost:3000',
+                'http://localhost:8002', // <--- IMPORTANTE: Libera seu Storefront local
+                'http://localhost:4200',
+                // Tenta pegar o domínio do Railway ou usa um fallback seguro
+                process.env.PUBLIC_DOMAIN ? `https://${process.env.PUBLIC_DOMAIN}` : 'https://lenda-camisetas-production.up.railway.app',
+            ],
+            credentials: true,
+        },
+        // ---------------------------------
+
         ...(isDev ? {
             adminApiPlayground: {
                 settings: { 'request.credentials': 'include' },
@@ -84,16 +95,11 @@ export const config: VendureConfig = {
     paymentOptions: {
         paymentMethodHandlers: [dummyPaymentHandler],
     },
-    // When adding or altering custom field definitions, the database will
-    // need to be updated. See the "Migrations" section in README.md.
     customFields: {},
     plugins: [
         AssetServerPlugin.init({
             route: 'assets',
             assetUploadDir: process.env.ASSET_VOLUME_PATH || path.join(__dirname, '../static/assets'),
-            // For local dev, the correct value for assetUrlPrefix should
-            // be guessed correctly, but for production it will usually need
-            // to be set manually to match your production url.
             assetUrlPrefix: isDev ? undefined : `https://${process.env.PUBLIC_DOMAIN}/assets/`,
         }),
         StripePlugin.init({
