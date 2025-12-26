@@ -35,9 +35,14 @@ const emailPluginOptions = isDev || !process.env.SENDGRID_API_KEY ? {
 } : {
     emailSender: new SendgridEmailSender(),
     transport: {
-        type: 'sendgrid',
-        apiKey: process.env.SENDGRID_API_KEY
-    }
+        type: 'smtp',
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+        },
+    },
 };
 
 export const config: VendureConfig = {
