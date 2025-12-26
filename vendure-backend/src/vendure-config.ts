@@ -9,9 +9,11 @@ import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import { StripePlugin } from '@vendure/payments-plugin/package/stripe';
-import { nodemailerSendgrid } from 'nodemailer-sendgrid';
+
 import 'dotenv/config';
 import path from 'path';
+
+const nodemailerSendgrid = require('nodemailer-sendgrid');
 
 const isDev = process.env.APP_ENV === 'dev';
 
