@@ -14,34 +14,34 @@ import path from 'path';
 
 const isDev: Boolean = process.env.APP_ENV === 'dev';
 
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-class SendgridEmailSender {
-    async send(email: any) {
-        await sgMail.send({
-            to: email.recipient,
-            from: email.from,
-            subject: email.subject,
-            html: email.body
-        });
-    }
-}
-
-const emailPluginOptions = isDev || !process.env.SENDGRID_API_KEY ? {
-    devMode: true,
-    outputPath: path.join(__dirname, '../static/email/test-emails'),
-    route: 'mailbox'
-} : {
-    emailSender: new SendgridEmailSender(),
+// Configuração unificada do Email Plugin
+const emailPluginOptions = process.env.SMTP_HOST ? {
     transport: {
         type: 'smtp',
         host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
+        port: Number(process.env.SMTP_PORT) || 587,
         auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS,
         },
+        logging: true,
+    },
+    templatePath: path.join(__dirname, '../static/email/templates'),
+    globalTemplateVars: {
+        fromAddress: '"Lenda Camisetas" <camisetas.lenda@gmail.com>',
+        verifyEmailAddressUrl: 'https://lenda-camisetas.up.railway.app/verify',
+        passwordResetUrl: 'https://lenda-camisetas.up.railway.app/password-reset',
+        changeEmailAddressUrl: 'https://lenda-camisetas.up.railway.app/verify-email-address-change'
+    },
+} : {
+    // Modo DEV (Local)
+    devMode: true,
+    outputPath: path.join(__dirname, '../static/email/test-emails'),
+    route: 'mailbox',
+    templatePath: path.join(__dirname, '../static/email/templates'),
+    globalTemplateVars: {
+        fromAddress: '"Lenda Camisetas Local" <dev@lendacamisetas.com>',
+        verifyEmailAddressUrl: 'http://localhost:3000/verify',
     },
 };
 
@@ -50,25 +50,20 @@ export const config: VendureConfig = {
         port: +(process.env.PORT || 3000),
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
-        
         cors: {
             origin: [
                 'http://localhost:3000',
                 'http://localhost:8002',
                 'http://localhost:4200',
                 process.env.PUBLIC_DOMAIN ? `https://${process.env.PUBLIC_DOMAIN}` : 'https://lenda-camisetas-production.up.railway.app',
+                'https://lenda-camisetas.up.railway.app' // Adicionei a URL do front por garantia
             ],
             credentials: true,
         },
-
         ...(isDev ? {
-            adminApiPlayground: {
-                settings: { 'request.credentials': 'include' },
-            },
+            adminApiPlayground: { settings: { 'request.credentials': 'include' } },
             adminApiDebug: true,
-            shopApiPlayground: {
-                settings: { 'request.credentials': 'include' },
-            },
+            shopApiPlayground: { settings: { 'request.credentials': 'include' } },
             shopApiDebug: true,
         } : {}),
     },
@@ -114,17 +109,12 @@ export const config: VendureConfig = {
         DefaultSchedulerPlugin.init(),
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
         DefaultSearchPlugin.init({ bufferUpdates: false, indexStockStatus: true }),
+        
         EmailPlugin.init({
             ...emailPluginOptions,
             handlers: defaultEmailHandlers,
-            templatePath: path.join(__dirname, '../static/email/templates'),
-            globalTemplateVars: {
-                fromAddress: process.env.EMAIL_FROM_ADDRESS || '"example" <noreply@example.com>',
-                verifyEmailAddressUrl: `${process.env.STOREFRONT_URL}/verify`,
-                passwordResetUrl: `${process.env.STOREFRONT_URL}/password-reset`,
-                changeEmailAddressUrl: `${process.env.STOREFRONT_URL}/verify-email-address-change`
-            },
         } as EmailPluginOptions | EmailPluginDevModeOptions),
+        
         AdminUiPlugin.init({
             route: 'admin',
             port: 3002,
