@@ -1,0 +1,23 @@
+import type {Metadata} from 'next';
+import {Cart} from "@/app/cart/cart";
+import {Suspense} from "react";
+import {CartSkeleton} from "@/components/shared/skeletons/cart-skeleton";
+import {noIndexRobots} from '@/lib/metadata';
+
+export const metadata: Metadata = {
+    title: 'Carrinho de Compras',
+    description: 'Revise itens no seu carrinho de compras.',
+    robots: noIndexRobots(),
+};
+
+export default function CartPage(_props: PageProps<'/cart'>) {
+    return (
+        <div className="container mx-auto px-4 py-20">
+            <h1 className="text-3xl font-bold mb-8">Carrinho de Compras</h1>
+
+            <Suspense fallback={<CartSkeleton />}>
+                <Cart/>
+            </Suspense>
+        </div>
+    );
+}

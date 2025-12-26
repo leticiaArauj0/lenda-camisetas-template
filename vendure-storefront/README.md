@@ -1,110 +1,88 @@
-# Vendure Remix Storefront Starter
+<p align="center">
+  <a href="https://vendure.io">
+    <img alt="Vendure logo" height="60" width="auto" src="https://a.storyblok.com/f/328257/699x480/8dbb4c7a3c/logo-icon.png/m/0x80">
+  </a>
+</p>
+<h1 align="center">
+  Vendure Next.js Storefront Starter
+</h1>
+<h3 align="center">
+    A Next.js 16 storefront starter for Vendure headless commerce
+</h3>
+<p align="center">
+ Use as a foundation to build upon, take inspiration from, or learn the ergonomics of the Vendure Shop API.
+</p>
+<h4 align="center">
+  <a href="https://next.vendure.io">Demo</a> |
+  <a href="https://docs.vendure.io">Documentation</a> |
+  <a href="https://vendure.io">Website</a>
+</h4>
 
-An e-commerce storefront for [Vendure](https://www.vendure.io) built with [Remix](https://remix.run).
+## Features
 
-👉 [remix-storefront.vendure.io](https://remix-storefront.vendure.io/)
+**Authentication & Accounts**
+- Customer registration with email verification
+- Login/logout with session management
+- Password reset & change password
+- Email address updates with verification
 
+**Customer Account**
+- Profile management (name, email, password)
+- Address management (create, update, delete, set default)
+- Order history with pagination & detailed order views
 
-## To do
+**Product Browsing**
+- Collections & featured products
+- Product detail pages with variants & galleries
+- Full-text search with faceted filtering
+- Pagination & sorting
 
-Most Vendure features are already part of this starter. Notable missing Vendure features:
-- Default billing/shipping addresses
-   - This is part of the account page (https://funkyton.com/vendure-tutorial//pull/39) but not yet used in checkout
-- Separate billing address in checkout
-- Promotions
-- Localization
-- Multi channel support
+**Shopping Cart**
+- Add/remove items, adjust quantities
+- Promotion code support
+- Real-time cart updates with totals
 
-General things missing:
-- Global input validation
-- Sitemap generation
-- Metadata
+**Checkout**
+- Multi-step flow: shipping address, delivery method, payment, review
+- Saved address selection
+- Shipping method selection
+- Payment integration
 
-**Contributions welcome!**
+**Order Management**
+- Order confirmation page
+- Order tracking with status
+- Detailed order information
 
-## Development
+## Roadmap
 
-1. Clone this repo
-2. `pnpm install`
-3. Create a `.env` file in the root dir with the following command and update it with your variables:
+- Multi-currency support (coming soon)
+- Multi-language with next-intl (coming soon)
 
-   ```bash
-   cp .env.template .env
-   ```
+## Getting Started
 
-4. `pnpm dev` - run the storefront with a local Remix server
+First, run the development server:
 
-### Vendure Server
-
-This storefront requires a Vendure server. You can either run a local instance, or use vendures public demo server.
-
-#### Local
-
-Use the vendure-backend in this repo:
-
-1. Follow the setup instructions in the main README
-2. Start the backend: `cd ../vendure-backend && pnpm dev`
-3. The storefront will connect to `http://localhost:3000/shop-api`
-
-For the public demo server, use: `https://readonlydemo.vendure.io/shop-api`
-
-#### Code Generation
-
-Whenever the Graphql documents (the constants using the `gql` tag) in the [./app/providers](./app/providers) dir changes,
-you should run `pnpm generate` to generate new sdk definitions.
-
-For a more detailed guide on how to work with code generation, check the wiki about [querying custom fields](https://funkyton.com/vendure-tutorial//wiki/Querying-custom-fields).
-
-## Payment Gateways
-
-Currently, both Stripe and Braintree are supported out of the box, but only one of them can be used at the same time
-
-### Stripe integration
-
-This repo has a built-in Stripe payment integration. To enable it, ensure that your Vendure server is set up with
-the [StripePlugin](https://docs.vendure.io/reference/core-plugins/payments-plugin/stripe-plugin/).
-
-Ensure your new PaymentMethod uses the word `stripe` somewhere in its code, as that's how this integration will know
-to load the Stripe payment element.
-
-Then add your Stripe publishable key to the env file:
-
-```
-STRIPE_PUBLISHABLE_KEY=pk_test_...
+```bash
+npm run dev
 ```
 
-**Important note**: There's a race condition between Stripe redirecting a customer to the confirmation page and the webhook receiving the confirmation in the Vendure backend. As this condition is not very distinguishable from other potential issues, it is currently addressed by implementing a very simple retry system of 5 retries every 2.5s You can tweak these settings in the [CheckoutConfirmation route](./app/routes/checkout/confirmation.%24orderCode.tsx).
+Open [http://localhost:3001](http://localhost:3001) with your browser to see the result.
 
-### Braintree integration
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This repo has built-in Braintree integration. To enable it, ensure that your Vendure server is set up with
-the [BraintreePlugin](https://docs.vendure.io/reference/core-plugins/payments-plugin/braintree-plugin/).
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-Currently, `storeCustomersInBraintree` has to be set to `true` in plugin options.
+## Learn More
 
-## Public demo
+To learn more about Next.js, take a look at the following resources:
 
-There is a publicly-available demo instance at https://readonlydemo.vendure.io/shop-api
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## Deployment
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-This repo is configured to deploy to Railway (recommended).
+## Deploy on Vercel
 
-### Railway (Recommended)
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Railway automatically detects Node.js apps and uses Railpack for fast deployments:
-
-1. Connect your GitHub repo to Railway
-2. Railway will automatically build using `pnpm install` and `pnpm build`
-3. The app will start with `pnpm start`
-
-
-No special setup should be needed, as the [remix.config.js](./remix.config.js) file contains a check for the `process.env.CF_PAGES` / `process.env.NETLIFY` environment variable to determine whether to use the Cloudflare Pages or Netlify server configuration.
-
-Follow the usual procedure for setting up a project in Netlify/CF Pages and point it to your clone of this repo on GitHub/Gitlab.
-
-**Be sure to change the cookie secret in [app/sessions.ts](./app/sessions.ts) for production use!**
-
-## License
-
-MIT
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
