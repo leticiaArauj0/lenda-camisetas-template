@@ -5,17 +5,29 @@ import {
     DefaultSearchPlugin,
     VendureConfig,
 } from '@vendure/core';
-import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
+import { defaultEmailHandlers, EmailPlugin, EmailSender, EmailDetails } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import { StripePlugin } from '@vendure/payments-plugin/package/stripe';
-
 import 'dotenv/config';
 import path from 'path';
 
-const nodemailerSendgrid = require('nodemailer-sendgrid');
+import sgMail from '@sendgrid/mail';
 
 const isDev = process.env.APP_ENV === 'dev';
+
+sgMail.setApiKey(process.env.SMTP_PASS || '');
+
+class SendgridApiSender implements EmailSender {
+    async send(email: EmailDetails) {
+        await sgMail.send({
+            to: email.recipient,
+            from: email.from,
+            subject: email.subject,
+            html: email.body,
+        });
+    }
+}
 
 export const config: VendureConfig = {
     apiOptions: {
@@ -26,7 +38,7 @@ export const config: VendureConfig = {
             origin: [
                 'http://localhost:3000',
                 'https://lenda-camisetas.up.railway.app',
-                process.env.STOREFRONT_URL || 'https://lenda-camisetas.up.railway.app',
+                process.env.STOREFRONT_URL || 'https://sua-loja.vercel.app',
             ],
             credentials: true,
         },
@@ -43,7 +55,7 @@ export const config: VendureConfig = {
     },
     dbConnectionOptions: {
         type: 'postgres',
-        synchronize: true,
+        synchronize: true, 
         logging: false,
         database: process.env.DB_NAME,
         schema: process.env.DB_SCHEMA,
@@ -72,20 +84,16 @@ export const config: VendureConfig = {
         EmailPlugin.init({
             handlers: defaultEmailHandlers,
             templatePath: path.join(__dirname, '../static/email/templates'),
-            transport: {
-                type: 'smtp',
-                host: 'smtp.sendgrid.net',
-                port: 2525,
-                secure: false,
-                auth: {
-                    user: 'apikey',
-                    pass: process.env.SMTP_PASS, 
-                },
-                logging: true, 
+            emailSender: new SendgridApiSender(),
+            transport: { 
+                type: 'file', 
+                outputPath: path.join(__dirname, '../test-emails') 
             },
             globalTemplateVars: {
                 fromAddress: '"Lenda Camisetas" <camisetas.lenda@gmail.com>',
                 verifyEmailAddressUrl: 'https://lenda-camisetas.up.railway.app/verify',
+                passwordResetUrl: 'https://lenda-camisetas.up.railway.app/password-reset',
+                changeEmailAddressUrl: 'https://lenda-camisetas.up.railway.app/verify-email-address-change'
             },
         }),
 
