@@ -42,6 +42,15 @@ export const config: VendureConfig = {
             ],
             credentials: true,
         },
+        middleware: [
+            {
+                handler: (req: any, res: any, next: any) => {
+                    req.app.set('trust proxy', 1);
+                    next();
+                },
+                route: '/',
+            },
+        ],
     },
     authOptions: {
         tokenMethod: ['bearer', 'cookie'],
