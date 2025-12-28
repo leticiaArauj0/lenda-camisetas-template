@@ -32,7 +32,6 @@ export function StripePaymentElement({
 
     startTransition(async () => {
       try {
-        // Confirmar pagamento com Stripe
         const { error, paymentIntent } = await stripe.confirmPayment({
           elements,
           redirect: 'if_required',
@@ -45,7 +44,6 @@ export function StripePaymentElement({
         }
 
         if (paymentIntent?.status === 'succeeded') {
-          // Confirmar pagamento no servidor Vendure
           const result = await processStripePayment(
             orderId,
             paymentIntent.id

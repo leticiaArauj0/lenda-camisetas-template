@@ -61,7 +61,8 @@ export function AddressForm({ countries, address, onSubmit, onCancel, isSubmitti
       countryCode: address.country.code,
       phoneNumber: address.phoneNumber || '',
     } : {
-      countryCode: countries[0]?.code || 'US',
+      // Dica: Se o foco for Brasil, você pode querer mudar o fallback para 'BR'
+      countryCode: countries[0]?.code || 'US', 
     }
   });
 
@@ -74,71 +75,71 @@ export function AddressForm({ countries, address, onSubmit, onCancel, isSubmitti
       <FieldGroup className="my-6">
         <div className="grid grid-cols-2 gap-4">
           <Field className="col-span-2">
-            <FieldLabel htmlFor="fullName">Full Name *</FieldLabel>
+            <FieldLabel htmlFor="fullName">Nome Completo *</FieldLabel>
             <Input
               id="fullName"
-              {...register('fullName', { required: 'Full name is required' })}
+              {...register('fullName', { required: 'O nome completo é obrigatório' })}
               disabled={isSubmitting}
             />
             <FieldError>{errors.fullName?.message}</FieldError>
           </Field>
 
           <Field className="col-span-2">
-            <FieldLabel htmlFor="company">Company</FieldLabel>
+            <FieldLabel htmlFor="company">Empresa (Opcional)</FieldLabel>
             <Input id="company" {...register('company')} disabled={isSubmitting} />
           </Field>
 
           <Field className="col-span-2">
-            <FieldLabel htmlFor="streetLine1">Street Address *</FieldLabel>
+            <FieldLabel htmlFor="streetLine1">Endereço (Rua e Número) *</FieldLabel>
             <Input
               id="streetLine1"
-              {...register('streetLine1', { required: 'Street address is required' })}
+              {...register('streetLine1', { required: 'O endereço é obrigatório' })}
               disabled={isSubmitting}
             />
             <FieldError>{errors.streetLine1?.message}</FieldError>
           </Field>
 
           <Field className="col-span-2">
-            <FieldLabel htmlFor="streetLine2">Apartment, suite, etc.</FieldLabel>
+            <FieldLabel htmlFor="streetLine2">Complemento (Apto, Bloco, etc.)</FieldLabel>
             <Input id="streetLine2" {...register('streetLine2')} disabled={isSubmitting} />
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="city">City *</FieldLabel>
+            <FieldLabel htmlFor="city">Cidade *</FieldLabel>
             <Input
               id="city"
-              {...register('city', { required: 'City is required' })}
+              {...register('city', { required: 'A cidade é obrigatória' })}
               disabled={isSubmitting}
             />
             <FieldError>{errors.city?.message}</FieldError>
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="province">State/Province *</FieldLabel>
+            <FieldLabel htmlFor="province">Estado/Província *</FieldLabel>
             <Input
               id="province"
-              {...register('province', { required: 'State/Province is required' })}
+              {...register('province', { required: 'O estado é obrigatório' })}
               disabled={isSubmitting}
             />
             <FieldError>{errors.province?.message}</FieldError>
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="postalCode">Postal Code *</FieldLabel>
+            <FieldLabel htmlFor="postalCode">CEP *</FieldLabel>
             <Input
               id="postalCode"
-              {...register('postalCode', { required: 'Postal code is required' })}
+              {...register('postalCode', { required: 'O CEP é obrigatório' })}
               disabled={isSubmitting}
             />
             <FieldError>{errors.postalCode?.message}</FieldError>
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="countryCode">Country *</FieldLabel>
+            <FieldLabel htmlFor="countryCode">País *</FieldLabel>
             <Controller
               name="countryCode"
               control={control}
-              rules={{ required: 'Country is required' }}
+              rules={{ required: 'O país é obrigatório' }}
               render={({ field }) => (
                 <CountrySelect
                   countries={countries}
@@ -152,11 +153,11 @@ export function AddressForm({ countries, address, onSubmit, onCancel, isSubmitti
           </Field>
 
           <Field className="col-span-2">
-            <FieldLabel htmlFor="phoneNumber">Phone Number *</FieldLabel>
+            <FieldLabel htmlFor="phoneNumber">Telefone *</FieldLabel>
             <Input
               id="phoneNumber"
               type="tel"
-              {...register('phoneNumber', { required: 'Phone number is required' })}
+              {...register('phoneNumber', { required: 'O telefone é obrigatório' })}
               disabled={isSubmitting}
             />
             <FieldError>{errors.phoneNumber?.message}</FieldError>
@@ -166,11 +167,11 @@ export function AddressForm({ countries, address, onSubmit, onCancel, isSubmitti
 
       <div className="flex gap-3 justify-end">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-          Cancel
+          Cancelar
         </Button>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {address ? 'Update address' : 'Save address'}
+          {address ? 'Atualizar endereço' : 'Salvar endereço'}
         </Button>
       </div>
     </form>

@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import { CreditCard } from 'lucide-react';
+import { CreditCard, Loader2 } from 'lucide-react';
 import { useCheckout } from '../checkout-provider';
 import { StripeProvider } from '@/components/providers/stripe-provider';
 import { StripePaymentElement } from '../stripe-payment-element';
+import { createStripePaymentIntent } from '../payment-actions'; 
 
 interface PaymentStepProps {
   onComplete: () => void;
@@ -17,14 +18,33 @@ interface PaymentStepProps {
 export default function PaymentStep({ onComplete }: PaymentStepProps) {
   const { paymentMethods, selectedPaymentMethodCode, setSelectedPaymentMethodCode, order } = useCheckout();
   const [showStripeForm, setShowStripeForm] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [isLoadingSecret, setIsLoadingSecret] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!selectedPaymentMethodCode) return;
 
-    // Se for Stripe, mostrar formulário em vez de prosseguir diretamente
     if (selectedPaymentMethodCode === 'stripe') {
-      setShowStripeForm(true);
+      setIsLoadingSecret(true);
+      setPaymentError(null);
+
+      try {
+        const response = await createStripePaymentIntent(order.id);
+
+        if (!response || !response.clientSecret) {
+          throw new Error('Não foi possível obter a chave de pagamento.');
+        }
+
+        setClientSecret(response.clientSecret);
+        setShowStripeForm(true);
+
+      } catch (err) {
+        console.error("Erro no Stripe:", err);
+        setPaymentError('Erro ao conectar com o servidor de pagamento.');
+      } finally {
+        setIsLoadingSecret(false);
+      }
       return;
     }
 
@@ -75,24 +95,38 @@ export default function PaymentStep({ onComplete }: PaymentStepProps) {
             ))}
           </RadioGroup>
 
+          {paymentError && (
+             <div className="text-sm text-destructive bg-destructive/10 p-3 rounded">
+               {paymentError}
+             </div>
+          )}
+
           <Button
             onClick={handleContinue}
-            disabled={!selectedPaymentMethodCode}
+            disabled={!selectedPaymentMethodCode || isLoadingSecret}
             className="w-full"
           >
-            Continuar para revisão
+            {isLoadingSecret ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Iniciando Pagamento...
+              </>
+            ) : (
+              'Continuar para Pagamento'
+            )}
           </Button>
         </>
       )}
 
-      {showStripeForm && selectedPaymentMethodCode === 'stripe' && (
-        <StripeProvider clientSecret={undefined}>
+      {showStripeForm && selectedPaymentMethodCode === 'stripe' && clientSecret && (
+        <StripeProvider clientSecret={clientSecret}>
           <div className="space-y-4">
             <Button
               variant="outline"
               onClick={() => {
                 setShowStripeForm(false);
                 setPaymentError(null);
+                setClientSecret(null);
               }}
               className="w-full"
             >

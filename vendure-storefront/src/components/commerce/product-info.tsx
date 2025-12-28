@@ -118,15 +118,15 @@ export function ProductInfo({product, searchParams}: ProductInfoProps) {
 
             if (result.success) {
                 setIsAdded(true);
-                toast.success('Added to cart', {
-                    description: `${product.name} has been added to your cart`,
+                toast.success('Adicionado ao carrinho', {
+                    description: `${product.name} foi adicionado ao seu carrinho.`,
                 });
 
                 // Reset the added state after 2 seconds
                 setTimeout(() => setIsAdded(false), 2000);
             } else {
                 toast.error('Error', {
-                    description: result.error || 'Failed to add item to cart',
+                    description: result.error || 'Falha ao adicionar o produto ao carrinho.',
                 });
             }
         });
