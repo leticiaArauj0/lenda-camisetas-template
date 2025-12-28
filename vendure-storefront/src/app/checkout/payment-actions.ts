@@ -37,6 +37,12 @@ const AddPaymentToOrderMutation = gql`
   }
 `;
 
+const CreateStripePaymentIntentMutation = gql`
+  mutation CreateStripePaymentIntent {
+    createStripePaymentIntent
+  }
+`;
+
 interface AddPaymentResult {
   __typename: string;
   id?: string;
@@ -59,10 +65,6 @@ interface CreatePaymentIntentResponse {
   error?: string;
 }
 
-/**
- * Processa o pagamento via Stripe no servidor
- * Comunica com a API Vendure para confirmar o pagamento
- */
 export async function processStripePayment(
   orderId: string,
   stripePaymentIntentId: string
@@ -103,35 +105,28 @@ export async function processStripePayment(
   }
 }
 
-/**
- * Cria um Payment Intent no servidor (chamado antes de renderizar Stripe Elements)
- * Esta função deve ser chamada antes de exibir o formulário de pagamento
- */
 export async function createStripePaymentIntent(
   orderId: string
 ): Promise<CreatePaymentIntentResponse> {
   try {
-    // Aqui você chamaria um endpoint do seu servidor que cria um PaymentIntent
-    // Por enquanto, retornamos null pois o Stripe Elements pode ser configurado sem clientSecret
-    // mas em produção você deve criar um PaymentIntent no servidor
-    
-    // Exemplo (descomentar quando tiver endpoint):
-    // const response = await fetch('/api/create-payment-intent', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ orderId }),
-    // });
-    
-    // const data = await response.json();
-    // if (!response.ok) {
-    //   return { clientSecret: null, error: data.error };
-    // }
-    
-    // return { clientSecret: data.clientSecret };
+    const result = await mutate(
+      CreateStripePaymentIntentMutation,
+      {},
+      { useAuthToken: true }
+    ) as unknown as { data: { createStripePaymentIntent: string } };
 
-    return { clientSecret: null };
+    if (!result || !result.data || !result.data.createStripePaymentIntent) {
+      console.error("Erro Vendure Stripe:", result);
+      throw new Error('O Vendure não retornou um clientSecret.');
+    }
+
+    const clientSecret = result.data.createStripePaymentIntent;
+    
+    return { clientSecret: clientSecret };
+
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Erro desconhecido';
+    console.error("Erro na createStripePaymentIntent:", error);
+    const message = error instanceof Error ? error.message : 'Erro desconhecido ao criar intenção de pagamento';
     return {
       clientSecret: null,
       error: message,

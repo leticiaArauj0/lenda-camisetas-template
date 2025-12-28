@@ -18,11 +18,11 @@ export default function DeliveryStep({ onComplete }: DeliveryStepProps) {
   const router = useRouter();
   const { shippingMethods, order } = useCheckout();
   const [selectedMethodId, setSelectedMethodId] = useState<string | null>(() => {
-    // If order already has a shipping method selected, pre-select it
+    // Se o pedido já tiver um método de envio selecionado, pré-selecione-o
     if (order.shippingLines && order.shippingLines.length > 0) {
       return order.shippingLines[0].shippingMethod.id;
     }
-    // Otherwise default to first method if there's only one
+    // Caso contrário, o padrão é o primeiro método se houver apenas um
     return shippingMethods.length === 1 ? shippingMethods[0].id : null;
   });
   const [submitting, setSubmitting] = useState(false);
@@ -36,7 +36,7 @@ export default function DeliveryStep({ onComplete }: DeliveryStepProps) {
       router.refresh();
       onComplete();
     } catch (error) {
-      console.error('Error setting shipping method:', error);
+      console.error('Erro ao definir método de entrega:', error);
     } finally {
       setSubmitting(false);
     }
@@ -45,14 +45,14 @@ export default function DeliveryStep({ onComplete }: DeliveryStepProps) {
   if (shippingMethods.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">No shipping methods available. Please check your address.</p>
+        <p className="text-muted-foreground">Nenhum método de entrega disponível. Por favor, verifique seu endereço.</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <h3 className="font-semibold">Select shipping method</h3>
+      <h3 className="font-semibold">Selecione o método de entrega</h3>
 
       <RadioGroup value={selectedMethodId || ''} onValueChange={setSelectedMethodId}>
         {shippingMethods.map((method) => (
@@ -74,10 +74,10 @@ export default function DeliveryStep({ onComplete }: DeliveryStepProps) {
                 <div className="text-right flex-shrink-0">
                   <p className="font-semibold">
                     {method.priceWithTax === 0
-                      ? 'FREE'
-                      : (method.priceWithTax / 100).toLocaleString('en-US', {
+                      ? 'GRÁTIS'
+                      : (method.priceWithTax / 100).toLocaleString('pt-BR', {
                           style: 'currency',
-                          currency: 'USD',
+                          currency: 'BRL',
                         })}
                   </p>
                 </div>
@@ -93,7 +93,7 @@ export default function DeliveryStep({ onComplete }: DeliveryStepProps) {
         className="w-full"
       >
         {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        Continue to payment
+        Continuar para pagamento
       </Button>
     </div>
   );

@@ -32,6 +32,7 @@ export default function PaymentStep({ onComplete }: PaymentStepProps) {
       try {
         const response = await createStripePaymentIntent(order.id);
 
+        console.log("RESPOSTA DO SERVIDOR:", JSON.stringify(response, null, 2));
         if (!response || !response.clientSecret) {
           throw new Error('Não foi possível obter a chave de pagamento.');
         }

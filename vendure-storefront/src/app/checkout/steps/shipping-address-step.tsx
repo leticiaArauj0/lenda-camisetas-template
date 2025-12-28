@@ -36,7 +36,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
   const router = useRouter();
   const { addresses, countries, order } = useCheckout();
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(() => {
-    // If order already has a shipping address, try to match it with saved addresses
+    // Se o pedido já tiver um endereço de entrega, tente combiná-lo com os endereços salvos
     if (order.shippingAddress) {
       const matchingAddress = addresses.find(
         (a) =>
@@ -45,7 +45,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
       );
       if (matchingAddress) return matchingAddress.id;
     }
-    // Otherwise use default shipping address
+    // Caso contrário, use o endereço de entrega padrão
     const defaultAddress = addresses.find((a) => a.defaultShippingAddress);
     return defaultAddress?.id || null;
   });
@@ -56,7 +56,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
 
   const { register, handleSubmit, formState: { errors }, reset, control } = useForm<AddressFormData>({
     defaultValues: {
-      countryCode: countries[0]?.code || 'US',
+      countryCode: countries[0]?.code || 'US', // Você pode querer mudar 'US' para 'BR' aqui
     }
   });
 
@@ -92,21 +92,21 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
   const onSaveNewAddress = async (data: AddressFormData) => {
     setSaving(true);
     try {
-      // First create the address in Vendure
+      // Primeiro cria o endereço no Vendure
       const newAddress = await createCustomerAddress(data);
 
-      // Close dialog and reset form
+      // Fecha o diálogo e reseta o formulário
       setDialogOpen(false);
       reset();
 
-      // Refresh to get updated addresses list
+      // Atualiza para obter a lista de endereços atualizada
       router.refresh();
 
-      // Select the newly created address
+      // Seleciona o endereço recém-criado
       setSelectedAddressId(newAddress.id);
     } catch (error) {
       console.error('Error creating address:', error);
-      alert(`Error creating address: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      alert(`Erro ao criar endereço: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     } finally {
       setSaving(false);
     }
@@ -116,7 +116,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
     <div className="space-y-6">
       {addresses.length > 0 && (
         <div className="space-y-4">
-          <h3 className="font-semibold">Select a saved address</h3>
+          <h3 className="font-semibold">Selecione um endereço salvo</h3>
           <RadioGroup value={selectedAddressId || ''} onValueChange={setSelectedAddressId}>
             {addresses.map((address) => (
               <div key={address.id} className="flex items-start space-x-3">
@@ -152,7 +152,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
               htmlFor="same-billing"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Use same address for billing
+              Usar o mesmo endereço para cobrança
             </label>
           </div>
 
@@ -163,28 +163,28 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
               className="flex-1"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Continue with selected address
+              Continuar com endereço selecionado
             </Button>
 
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button type="button" variant="outline">
-                  Add new address
+                  Novo endereço
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <form onSubmit={handleSubmit(onSaveNewAddress)}>
                   <DialogHeader>
-                    <DialogTitle>Add new address</DialogTitle>
+                    <DialogTitle>Adicionar novo endereço</DialogTitle>
                     <DialogDescription>
-                      Fill in the form below to add a new shipping address
+                      Preencha o formulário abaixo para adicionar um novo endereço de entrega
                     </DialogDescription>
                   </DialogHeader>
 
                   <FieldGroup className="my-6">
                     <div className="grid grid-cols-2 gap-4">
                       <Field className="col-span-2">
-                        <FieldLabel htmlFor="fullName">Full Name</FieldLabel>
+                        <FieldLabel htmlFor="fullName">Nome Completo</FieldLabel>
                         <Input
                           id="fullName"
                           {...register('fullName')}
@@ -193,26 +193,26 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                       </Field>
 
                       <Field className="col-span-2">
-                        <FieldLabel htmlFor="company">Company</FieldLabel>
+                        <FieldLabel htmlFor="company">Empresa</FieldLabel>
                         <Input id="company" {...register('company')} />
                       </Field>
 
                       <Field className="col-span-2">
-                        <FieldLabel htmlFor="streetLine1">Street Address *</FieldLabel>
+                        <FieldLabel htmlFor="streetLine1">Endereço (Rua) *</FieldLabel>
                         <Input
                           id="streetLine1"
-                          {...register('streetLine1', { required: 'Street address is required' })}
+                          {...register('streetLine1', { required: 'O endereço é obrigatório' })}
                         />
                         <FieldError>{errors.streetLine1?.message}</FieldError>
                       </Field>
 
                       <Field className="col-span-2">
-                        <FieldLabel htmlFor="streetLine2">Apartment, suite, etc.</FieldLabel>
+                        <FieldLabel htmlFor="streetLine2">Complemento (Apto, bloco, etc.)</FieldLabel>
                         <Input id="streetLine2" {...register('streetLine2')} />
                       </Field>
 
                       <Field>
-                        <FieldLabel htmlFor="city">City</FieldLabel>
+                        <FieldLabel htmlFor="city">Cidade</FieldLabel>
                         <Input
                           id="city"
                           {...register('city')}
@@ -221,7 +221,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                       </Field>
 
                       <Field>
-                        <FieldLabel htmlFor="province">State/Province</FieldLabel>
+                        <FieldLabel htmlFor="province">Estado</FieldLabel>
                         <Input
                           id="province"
                           {...register('province')}
@@ -230,7 +230,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                       </Field>
 
                       <Field>
-                        <FieldLabel htmlFor="postalCode">Postal Code</FieldLabel>
+                        <FieldLabel htmlFor="postalCode">CEP</FieldLabel>
                         <Input
                           id="postalCode"
                           {...register('postalCode')}
@@ -239,11 +239,11 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                       </Field>
 
                       <Field>
-                        <FieldLabel htmlFor="countryCode">Country *</FieldLabel>
+                        <FieldLabel htmlFor="countryCode">País *</FieldLabel>
                         <Controller
                           name="countryCode"
                           control={control}
-                          rules={{ required: 'Country is required' }}
+                          rules={{ required: 'O país é obrigatório' }}
                           render={({ field }) => (
                             <CountrySelect
                               countries={countries}
@@ -257,7 +257,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                       </Field>
 
                       <Field className="col-span-2">
-                        <FieldLabel htmlFor="phoneNumber">Phone Number</FieldLabel>
+                        <FieldLabel htmlFor="phoneNumber">Telefone</FieldLabel>
                         <Input
                           id="phoneNumber"
                           type="tel"
@@ -270,11 +270,11 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
 
                   <DialogFooter>
                     <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} disabled={saving}>
-                      Cancel
+                      Cancelar
                     </Button>
                     <Button type="submit" disabled={saving}>
                       {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Save address
+                      Salvar endereço
                     </Button>
                   </DialogFooter>
                 </form>
@@ -289,16 +289,16 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <form onSubmit={handleSubmit(onSaveNewAddress)}>
               <DialogHeader>
-                <DialogTitle>Add shipping address</DialogTitle>
+                <DialogTitle>Adicionar endereço de entrega</DialogTitle>
                 <DialogDescription>
-                  Fill in the form below to add your shipping address
+                  Preencha o formulário abaixo para adicionar seu endereço de entrega
                 </DialogDescription>
               </DialogHeader>
 
               <FieldGroup className="my-6">
                 <div className="grid grid-cols-2 gap-4">
                   <Field className="col-span-2">
-                    <FieldLabel htmlFor="fullName">Full Name</FieldLabel>
+                    <FieldLabel htmlFor="fullName">Nome Completo</FieldLabel>
                     <Input
                       id="fullName"
                       {...register('fullName')}
@@ -307,26 +307,26 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                   </Field>
 
                   <Field className="col-span-2">
-                    <FieldLabel htmlFor="company">Company</FieldLabel>
+                    <FieldLabel htmlFor="company">Empresa</FieldLabel>
                     <Input id="company" {...register('company')} />
                   </Field>
 
                   <Field className="col-span-2">
-                    <FieldLabel htmlFor="streetLine1">Street Address *</FieldLabel>
+                    <FieldLabel htmlFor="streetLine1">Endereço (Rua) *</FieldLabel>
                     <Input
                       id="streetLine1"
-                      {...register('streetLine1', { required: 'Street address is required' })}
+                      {...register('streetLine1', { required: 'O endereço é obrigatório' })}
                     />
                     <FieldError>{errors.streetLine1?.message}</FieldError>
                   </Field>
 
                   <Field className="col-span-2">
-                    <FieldLabel htmlFor="streetLine2">Apartment, suite, etc.</FieldLabel>
+                    <FieldLabel htmlFor="streetLine2">Complemento (Apto, bloco, etc.)</FieldLabel>
                     <Input id="streetLine2" {...register('streetLine2')} />
                   </Field>
 
                   <Field>
-                    <FieldLabel htmlFor="city">City</FieldLabel>
+                    <FieldLabel htmlFor="city">Cidade</FieldLabel>
                     <Input
                       id="city"
                       {...register('city')}
@@ -335,7 +335,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                   </Field>
 
                   <Field>
-                    <FieldLabel htmlFor="province">State/Province</FieldLabel>
+                    <FieldLabel htmlFor="province">Estado</FieldLabel>
                     <Input
                       id="province"
                       {...register('province')}
@@ -344,7 +344,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                   </Field>
 
                   <Field>
-                    <FieldLabel htmlFor="postalCode">Postal Code</FieldLabel>
+                    <FieldLabel htmlFor="postalCode">CEP</FieldLabel>
                     <Input
                       id="postalCode"
                       {...register('postalCode')}
@@ -353,11 +353,11 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                   </Field>
 
                   <Field>
-                    <FieldLabel htmlFor="countryCode">Country *</FieldLabel>
+                    <FieldLabel htmlFor="countryCode">País *</FieldLabel>
                     <Controller
                       name="countryCode"
                       control={control}
-                      rules={{ required: 'Country is required' }}
+                      rules={{ required: 'O país é obrigatório' }}
                       render={({ field }) => (
                         <CountrySelect
                           countries={countries}
@@ -371,7 +371,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                   </Field>
 
                   <Field className="col-span-2">
-                    <FieldLabel htmlFor="phoneNumber">Phone Number</FieldLabel>
+                    <FieldLabel htmlFor="phoneNumber">Telefone</FieldLabel>
                     <Input
                       id="phoneNumber"
                       type="tel"
@@ -385,7 +385,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
               <DialogFooter>
                 <Button type="submit" disabled={saving} className="w-full">
                   {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save address
+                  Salvar endereço
                 </Button>
               </DialogFooter>
             </form>
