@@ -85,6 +85,8 @@ export const config: VendureConfig = {
         }),
         StripePlugin.init({
             storeCustomersInStripe: true,
+            // @ts-ignore
+            paymentMethodTypes: ['card', 'boleto', 'pix'],
         }),
         DefaultSchedulerPlugin.init(),
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
