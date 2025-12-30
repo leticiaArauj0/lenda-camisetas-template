@@ -147,11 +147,6 @@ export function ProductInfo({product, searchParams}: ProductInfoProps) {
                 )}
             </div>
 
-            {/* Product Description */}
-            <div className="prose prose-sm max-w-none">
-                <div dangerouslySetInnerHTML={{__html: product.description}}/>
-            </div>
-
             {/* Option Groups */}
             {product.optionGroups.length > 0 && (
                 <div className="space-y-4">
@@ -224,6 +219,11 @@ export function ProductInfo({product, searchParams}: ProductInfoProps) {
                         </>
                     )}
                 </Button>
+            </div>
+
+            {/* Product Description */}
+            <div className="prose prose-sm max-w-none indent-5">
+                <div dangerouslySetInnerHTML={{__html: product.description}}/>
             </div>
 
             {/* SKU */}

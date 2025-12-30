@@ -73,11 +73,11 @@ export default function OrderSummary() {
           )}
 
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Shipping</span>
+            <span className="text-muted-foreground">Frete</span>
             <span>
               {order.shippingWithTax > 0
                 ? <Price value={order.shippingWithTax} currencyCode={order.currencyCode} />
-                : 'To be calculated'}
+                : 'A ser calculado'}
             </span>
           </div>
         </div>

@@ -23,7 +23,7 @@ export function LoginButton({isLoggedIn, ...props}: LoginButtonProps) {
                         router.push('/sign-in')
                     }
                 }}>
-            {isLoggedIn ? 'Sign out' : 'Login'}
+            {isLoggedIn ? 'Sair' : 'Login'}
         </button>
     )
 }

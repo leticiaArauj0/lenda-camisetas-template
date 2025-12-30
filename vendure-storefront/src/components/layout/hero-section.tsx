@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export function HeroSection() {
     return (
-        <section className="h-150 bg-[url('/banner.png')] bg-cover relative bg-center sm:bg-top">
+        <section className="h-150 bg-[url('/banner.webp')] bg-cover relative bg-center sm:bg-top">
             <div className="absolute inset-0 bg-black/30"></div>
             
             <div className="h-140 container mx-auto px-4 py-24 md:py-32 flex items-center relative z-10 dark">
